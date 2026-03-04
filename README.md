@@ -1,23 +1,34 @@
+# Smart Console Calculator (Python)
 
-# Simple Calculator (Python)
+A faster and more realistic calculator experience in the terminal.
 
-This is a beginner-friendly calculator program built using Python basics.
+## Highlights
+- **Two input styles**
+  - **Normal mode**: enter number + operator + number
+  - **Quick mode**: type a full expression like `(12+3)*2/5`
+- Supports operators: `+`, `-`, `*`, `/`, `^`, `%`
+- `ans` memory to reuse your latest result
+- Calculation history (last 10 shown)
+- Clean result formatting (e.g., `5` instead of `5.0`)
+- Safe expression evaluation using Python AST
+- Friendly command menu: `help`, `history`, `clear`, `exit`
 
-## Features
-- Addition
-- Subtraction
-- Multiplication
-- Division
-- Exit option
+## Commands
+- `normal` → step-by-step input
+- `quick` → expression input
+- `history` → show recent calculations
+- `clear` → clear history + reset `ans`
+- `help` → usage instructions
+- `exit` → quit calculator
 
-## Concepts Used
-- While loop
-- If-else conditions
-- User input
-- Error handling (try-except)
+## Run
+```bash
+python calculator.py
+```
 
-## Level
-Beginner (Python Basics)
-
-## How to Run
-Run this code using any online Python compiler like Programiz or Replit.
+## Example (Quick mode)
+```text
+Mode [normal/quick/help/history/clear/exit]: quick
+Enter expression: (15+5)*2
+Result: 40
+```
