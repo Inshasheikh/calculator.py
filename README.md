@@ -1,7 +1,7 @@
 
 # Simple Calculator (HTML,CSS, Javascript)
 
-This is a beginner-friendly calculator program built using Python basics.
+This is a beginner-friendly calculator program built using (HTML, CSS, Javascript).
 
 ## Features
 - Addition
@@ -17,7 +17,7 @@ This is a beginner-friendly calculator program built using Python basics.
 - Error handling (try-except)
 
 ## Level
-Beginner (Python Basics)
+Intermediate 
 
 ## How to Run
-Run this code using any online Python compiler like Programiz or Replit.
+Run this code using any online  compiler like Programiz or Replit.
