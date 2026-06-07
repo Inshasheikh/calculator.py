@@ -1,0 +1,88 @@
+/* Theme 1: Dark Mode */
+.dark-mode {
+    background: #1a1a2e;
+}
+.dark-mode .calculator {
+    background: #16213e;
+}
+
+/* Theme 2: Neon Cyberpunk */
+.neon-mode {
+    background: #0f0f0f;
+}
+.neon-mode button {
+    border: 1px solid #00ff00;
+    box-shadow: 0 0 10px #00ff00;
+}
+
+/* Theme 3: Pastel Soft */
+.pastel-mode {
+    background: linear-gradient(135deg, #fbc2eb, #a6c1ee);
+}
+
+/* Current */
+background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+
+/* Try karo koi bhi */
+background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+
+
+/* Operator button color change */
+.operator {
+    background: #ff6b6b;  /* Pink-red */
+    /* Ya */
+    background: #48dbfb;  /* Light blue */
+}
+
+
+.current-operand {
+    font-size: 3.5rem;  /* Badhane ke liye */
+    /* Ya */
+    font-size: 2rem;     /* Kam karne ke liye */
+}
+
+/* CSS - Isko style section mein add karo */
+.footer {
+    text-align: center;
+    margin-top: 25px;
+    padding-top: 15px;
+    border-top: 1px solid rgba(255, 255, 255, 0.2);
+    font-size: 0.75rem;
+    color: rgba(255, 255, 255, 0.7);
+    font-family: monospace;
+    letter-spacing: 1px;
+}
+
+.footer span {
+    display: inline-block;
+    animation: gentlePulse 2s ease-in-out infinite;
+}
+
+@keyframes gentlePulse {
+    0%, 100% { opacity: 0.6; }
+    50% { opacity: 1; }
+}
+/* Button hover effect */
+button:hover {
+    transform: translateY(-2px);
+    filter: brightness(1.05);
+}
+
+/* Smooth shadow */
+.calculator {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.calculator:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 30px 60px rgba(0,0,0,0.3);
+}
+
+/* History panel smooth animation */
+.history-panel {
+    transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+

@@ -1,0 +1,733 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <title>Smart Calculator | Hidden History</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* Light Mode */
+        :root {
+            --bg-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --calculator-bg: rgba(255, 255, 255, 0.95);
+            --display-bg: #1e293b;
+            --display-previous: #94a3b8;
+            --display-current: #ffffff;
+            --button-bg: #f1f5f9;
+            --button-text: #1e293b;
+            --operator-bg: #f59e0b;
+            --operator-text: white;
+            --clear-bg: #ef4444;
+            --delete-bg: #64748b;
+            --equals-bg: #10b981;
+            --percent-bg: #8b5cf6;
+            --memory-bg: #3b82f6;
+            --history-bg: #ec489a;
+            --history-item-bg: #f8fafc;
+            --history-text: #1e293b;
+            --history-time: #94a3b8;
+            --border-color: #e2e8f0;
+            --history-panel-bg: rgba(255, 255, 255, 0.98);
+        }
+
+        /* Dark Mode */
+        body.dark {
+            --bg-gradient: linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%);
+            --calculator-bg: rgba(15, 23, 42, 0.95);
+            --display-bg: #0a0f1a;
+            --display-previous: #64748b;
+            --display-current: #e2e8f0;
+            --button-bg: #1e293b;
+            --button-text: #e2e8f0;
+            --operator-bg: #d97706;
+            --operator-text: white;
+            --clear-bg: #dc2626;
+            --delete-bg: #475569;
+            --equals-bg: #059669;
+            --percent-bg: #7c3aed;
+            --memory-bg: #2563eb;
+            --history-bg: #db2777;
+            --history-item-bg: #334155;
+            --history-text: #e2e8f0;
+            --history-time: #94a3b8;
+            --border-color: #334155;
+            --history-panel-bg: rgba(30, 41, 59, 0.98);
+        }
+
+        body {
+            background: var(--bg-gradient);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Segoe UI', 'Poppins', sans-serif;
+            padding: 20px;
+            position: relative;
+        }
+
+        /* Main Calculator */
+        .calculator {
+            background: var(--calculator-bg);
+            backdrop-filter: blur(10px);
+            border-radius: 40px;
+            padding: 20px;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.2);
+            width: 100%;
+            max-width: 500px;
+            position: relative;
+            z-index: 10;
+        }
+
+        /* Dark Mode Toggle */
+        .theme-toggle {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: var(--button-bg);
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--button-text);
+            z-index: 10;
+        }
+
+        /* Memory Indicator */
+        .memory-indicator {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            background: var(--memory-bg);
+            color: white;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.65rem;
+            font-weight: bold;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            z-index: 10;
+        }
+
+        .memory-indicator.active {
+            opacity: 1;
+        }
+
+        /* Display */
+        .display {
+            background: var(--display-bg);
+            border-radius: 25px;
+            padding: 20px;
+            margin: 50px 0 20px 0;
+        }
+
+        .previous-operand {
+            color: var(--display-previous);
+            font-size: 0.85rem;
+            text-align: right;
+            min-height: 22px;
+        }
+
+        .current-operand {
+            color: var(--display-current);
+            font-size: 2.5rem;
+            text-align: right;
+            font-weight: 700;
+            word-wrap: break-word;
+        }
+
+        /* Buttons Grid */
+        .buttons {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        button {
+            border: none;
+            background: var(--button-bg);
+            padding: 14px 0;
+            font-size: 1.2rem;
+            font-weight: 600;
+            border-radius: 20px;
+            cursor: pointer;
+            font-family: inherit;
+            color: var(--button-text);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            transition: transform 0.05s ease;
+        }
+
+        button:active {
+            transform: scale(0.95);
+        }
+
+        .operator {
+            background: var(--operator-bg);
+            color: var(--operator-text);
+        }
+
+        .clear {
+            background: var(--clear-bg);
+            color: white;
+        }
+
+        .equals {
+            background: var(--equals-bg);
+            color: white;
+        }
+
+        .delete {
+            background: var(--delete-bg);
+            color: white;
+        }
+
+        .percent {
+            background: var(--percent-bg);
+            color: white;
+        }
+
+        .memory {
+            background: var(--memory-bg);
+            color: white;
+            font-size: 0.9rem;
+        }
+
+        .history-toggle {
+            background: var(--history-bg);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+        }
+
+        .zero {
+            grid-column: span 2;
+        }
+
+        /* ========== HISTORY OVERLAY (Popup Style) ========== */
+        .history-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(5px);
+            z-index: 1000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            visibility: hidden;
+            opacity: 0;
+            transition: all 0.3s ease;
+        }
+
+        .history-overlay.show {
+            visibility: visible;
+            opacity: 1;
+        }
+
+        .history-popup {
+            background: var(--history-panel-bg);
+            border-radius: 40px;
+            width: 90%;
+            max-width: 450px;
+            max-height: 80vh;
+            padding: 20px;
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.3);
+            transform: scale(0.9);
+            transition: transform 0.3s ease;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .history-overlay.show .history-popup {
+            transform: scale(1);
+        }
+
+        .history-popup-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        .history-popup-header h3 {
+            color: var(--history-text);
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .close-history {
+            background: var(--delete-bg);
+            border: none;
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1.2rem;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .history-actions {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .clear-history-btn {
+            background: var(--clear-bg);
+            border: none;
+            padding: 8px 16px;
+            border-radius: 25px;
+            color: white;
+            cursor: pointer;
+            font-size: 0.8rem;
+            font-weight: bold;
+            flex: 1;
+        }
+
+        .history-list-popup {
+            flex: 1;
+            overflow-y: auto;
+            max-height: 50vh;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .history-item {
+            background: var(--history-item-bg);
+            padding: 12px;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border-left: 4px solid var(--history-bg);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .history-item:active {
+            transform: scale(0.98);
+        }
+
+        .history-left {
+            flex: 1;
+        }
+
+        .history-calculation {
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: var(--history-text);
+            font-family: monospace;
+        }
+
+        .history-result {
+            font-size: 1rem;
+            font-weight: bold;
+            color: var(--equals-bg);
+            margin-top: 4px;
+        }
+
+        .history-time {
+            font-size: 0.6rem;
+            color: var(--history-time);
+            font-family: monospace;
+        }
+
+        .no-history {
+            text-align: center;
+            color: var(--history-time);
+            padding: 40px 20px;
+            font-size: 0.9rem;
+        }
+
+        /* Scrollbar */
+        .history-list-popup::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .history-list-popup::-webkit-scrollbar-track {
+            background: var(--border-color);
+            border-radius: 10px;
+        }
+
+        .history-list-popup::-webkit-scrollbar-thumb {
+            background: var(--history-bg);
+            border-radius: 10px;
+        }
+
+        /* Mobile */
+        @media (max-width: 480px) {
+            .calculator { padding: 15px; }
+            button { padding: 11px 0; font-size: 1rem; }
+            .memory { font-size: 0.75rem; }
+            .current-operand { font-size: 2rem; }
+            .buttons { gap: 8px; }
+            .theme-toggle { width: 35px; height: 35px; font-size: 1rem; top: 12px; right: 12px; }
+            .memory-indicator { top: 12px; left: 12px; font-size: 0.55rem; }
+            .history-popup { width: 95%; border-radius: 30px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="calculator">
+        <!-- Dark Mode Toggle -->
+        <button class="theme-toggle" id="themeToggleBtn">🌙</button>
+        
+        <!-- Memory Indicator -->
+        <div class="memory-indicator" id="memoryIndicator">M</div>
+        
+        <!-- Display -->
+        <div class="display">
+            <div class="previous-operand" id="previousDisplay"></div>
+            <div class="current-operand" id="currentDisplay">0</div>
+        </div>
+        
+        <!-- Buttons -->
+        <div class="buttons">
+           
+            
+            <button class="clear" id="clearBtn">AC</button>
+           
+            <button class="percent" id="percentBtn">%</button>
+            <button class="operator" id="divideBtn">÷</button>
+             <button class="delete" id="deleteBtn">⌫</button>
+            
+            <button class="number" data-num="7">7</button>
+            <button class="number" data-num="8">8</button>
+            <button class="number" data-num="9">9</button>
+            <button class="operator" id="multiplyBtn">×</button>
+            
+            <button class="number" data-num="4">4</button>
+            <button class="number" data-num="5">5</button>
+            <button class="number" data-num="6">6</button>
+            <button class="operator" id="subtractBtn">−</button>
+            
+            <button class="number" data-num="1">1</button>
+            <button class="number" data-num="2">2</button>
+            <button class="number" data-num="3">3</button>
+            <button class="operator" id="addBtn">+</button>
+            
+            <button class="number zero" data-num="0">0</button>
+            <button class="number" data-num=".">.</button>
+            <button class="history-toggle" id="historyToggleBtn">
+    <img src="history.png" alt="History" style="width: 18px; height: 18px; margin-right: 6px; vertical-align: middle;">
+    
+</button>
+
+<button class="history-toggle" id="historyToggleBtn">
+    <img src="icons8-equal-50.png" alt="History" style="width: 18px; height: 18px; margin-right: 6px; vertical-align: middle;">
+    
+</button>
+            
+        </div>
+    </div>
+
+    <!-- History Overlay Popup -->
+    <div class="history-overlay" id="historyOverlay">
+        <div class="history-popup">
+            <div class="history-popup-header">
+                <h3>📜 Calculation History</h3>
+                <button class="close-history" id="closeHistoryBtn">✕</button>
+            </div>
+            <div class="history-actions">
+                <button class="clear-history-btn" id="clearHistoryBtn">🗑️ Clear All</button>
+            </div>
+            <div class="history-list-popup" id="historyListPopup">
+                <div class="no-history">📭 No calculations yet<br>Press = to save history</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ========== HISTORY ARRAY ==========
+        let history = [];
+        const MAX_HISTORY = 20;
+        
+        function loadHistory() {
+            const saved = localStorage.getItem('calculatorHistory');
+            if (saved) {
+                history = JSON.parse(saved);
+                renderHistory();
+            }
+        }
+        
+        function saveHistory() {
+            localStorage.setItem('calculatorHistory', JSON.stringify(history));
+        }
+        
+        function addToHistory(expression, result) {
+            history.unshift({
+                id: Date.now(),
+                expression: expression,
+                result: result,
+                time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+                date: new Date().toLocaleDateString()
+            });
+            if (history.length > MAX_HISTORY) history.pop();
+            saveHistory();
+            renderHistory();
+        }
+        
+        function renderHistory() {
+            const historyList = document.getElementById('historyListPopup');
+            if (history.length === 0) {
+                historyList.innerHTML = '<div class="no-history">📭 No calculations yet<br>Press = to save history</div>';
+                return;
+            }
+            historyList.innerHTML = history.map(item => `
+                <div class="history-item" onclick="recallCalculation('${item.result}')">
+                    <div class="history-left">
+                        <div class="history-calculation">${item.expression}</div>
+                        <div class="history-result">= ${item.result}</div>
+                        <div class="history-time">${item.date} • ${item.time}</div>
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        function recallCalculation(result) {
+            currentNumber = result;
+            previousNumber = '';
+            operation = null;
+            waitingForNewNumber = true;
+            updateDisplay();
+            closeHistoryPopup();
+            showTempMessage("📜 Loaded");
+        }
+        
+        function clearHistory() {
+            if (confirm('Delete all calculation history?')) {
+                history = [];
+                saveHistory();
+                renderHistory();
+                showTempMessage("🗑️ History cleared");
+            }
+        }
+        
+        // History Popup Controls
+        function openHistoryPopup() {
+            document.getElementById('historyOverlay').classList.add('show');
+        }
+        
+        function closeHistoryPopup() {
+            document.getElementById('historyOverlay').classList.remove('show');
+        }
+        
+        function showTempMessage(msg) {
+            const original = currentDisplay.textContent;
+            currentDisplay.textContent = msg;
+            setTimeout(() => {
+                if (currentDisplay.textContent === msg) updateDisplay();
+            }, 600);
+        }
+        
+        // ========== DARK MODE ==========
+        const themeToggle = document.getElementById('themeToggleBtn');
+        let isDark = localStorage.getItem('darkMode') === 'true';
+        
+        function applyTheme() {
+            if (isDark) {
+                document.body.classList.add('dark');
+                themeToggle.textContent = '☀️';
+            } else {
+                document.body.classList.remove('dark');
+                themeToggle.textContent = '🌙';
+            }
+        }
+        
+        themeToggle.addEventListener('click', () => {
+            isDark = !isDark;
+            localStorage.setItem('darkMode', isDark);
+            applyTheme();
+        });
+        applyTheme();
+        
+        // ========== MEMORY ==========
+        let memory = 0;
+        const memoryIndicator = document.getElementById('memoryIndicator');
+        
+        function updateMemoryIndicator() {
+            memoryIndicator.classList.toggle('active', memory !== 0);
+        }
+        
+        // ========== CALCULATOR CORE ==========
+        const previousDisplay = document.getElementById('previousDisplay');
+        const currentDisplay = document.getElementById('currentDisplay');
+        
+        let currentNumber = '0';
+        let previousNumber = '';
+        let operation = null;
+        let waitingForNewNumber = false;
+        
+        function updateDisplay() {
+            currentDisplay.textContent = currentNumber;
+            if (previousNumber && operation) {
+                previousDisplay.textContent = `${previousNumber} ${getSymbol(operation)}`;
+            } else {
+                previousDisplay.textContent = previousNumber || '';
+            }
+        }
+        
+        function getSymbol(op) {
+            const symbols = { '+': '+', '-': '−', '×': '×', '÷': '÷' };
+            return symbols[op] || op;
+        }
+        
+        function addNumber(num) {
+            if (waitingForNewNumber) {
+                currentNumber = num;
+                waitingForNewNumber = false;
+            } else {
+                if (num === '.' && currentNumber.includes('.')) return;
+                if (currentNumber === '0' && num !== '.') {
+                    currentNumber = num;
+                } else {
+                    if (currentNumber.length < 16) currentNumber += num;
+                }
+            }
+            updateDisplay();
+        }
+        
+        function clearAll() {
+            currentNumber = '0';
+            previousNumber = '';
+            operation = null;
+            waitingForNewNumber = false;
+            updateDisplay();
+        }
+        
+        function deleteLast() {
+            if (waitingForNewNumber) return;
+            if (currentNumber.length === 1) {
+                currentNumber = '0';
+            } else {
+                currentNumber = currentNumber.slice(0, -1);
+                if (currentNumber === '') currentNumber = '0';
+            }
+            updateDisplay();
+        }
+        
+        function percentage() {
+            let num = parseFloat(currentNumber);
+            if (isNaN(num)) return;
+            currentNumber = (num / 100).toString();
+            waitingForNewNumber = false;
+            updateDisplay();
+        }
+        
+        function calculate() {
+            if (!operation || !previousNumber || waitingForNewNumber) return;
+            const prev = parseFloat(previousNumber);
+            const curr = parseFloat(currentNumber);
+            if (isNaN(prev) || isNaN(curr)) return;
+            let result;
+            switch(operation) {
+                case '+': result = prev + curr; break;
+                case '-': result = prev - curr; break;
+                case '×': result = prev * curr; break;
+                case '÷':
+                    if (curr === 0) { alert("Cannot divide by zero!"); clearAll(); return; }
+                    result = prev / curr; break;
+                default: return;
+            }
+            result = parseFloat(result.toFixed(10));
+            const expression = `${previousNumber} ${getSymbol(operation)} ${currentNumber}`;
+            currentNumber = result.toString();
+            previousNumber = '';
+            operation = null;
+            waitingForNewNumber = true;
+            updateDisplay();
+            addToHistory(expression, result.toString());
+        }
+        
+        function setOperation(op) {
+            if (operation && !waitingForNewNumber && previousNumber) calculate();
+            if (currentNumber === '') return;
+            operation = op;
+            previousNumber = currentNumber;
+            waitingForNewNumber = true;
+            updateDisplay();
+        }
+        
+        function handleEquals() {
+            if (!operation || waitingForNewNumber) return;
+            calculate();
+        }
+        
+        // Memory Functions
+        document.getElementById('memoryClear').addEventListener('click', () => { memory = 0; updateMemoryIndicator(); showTempMessage("MC"); });
+        document.getElementById('memoryAdd').addEventListener('click', () => { let v = parseFloat(currentNumber); if (!isNaN(v)) { memory += v; updateMemoryIndicator(); showTempMessage("M+"); } });
+        document.getElementById('memorySubtract').addEventListener('click', () => { let v = parseFloat(currentNumber); if (!isNaN(v)) { memory -= v; updateMemoryIndicator(); showTempMessage("M-"); } });
+        document.getElementById('memoryRecall').addEventListener('click', () => { currentNumber = memory.toString(); waitingForNewNumber = true; updateDisplay(); showTempMessage("MR"); });
+        
+        // Button Events
+        document.querySelectorAll('.number').forEach(btn => {
+            btn.addEventListener('click', () => addNumber(btn.getAttribute('data-num')));
+        });
+        document.getElementById('clearBtn').addEventListener('click', clearAll);
+        document.getElementById('deleteBtn').addEventListener('click', deleteLast);
+        document.getElementById('percentBtn').addEventListener('click', percentage);
+        document.getElementById('addBtn').addEventListener('click', () => setOperation('+'));
+        document.getElementById('subtractBtn').addEventListener('click', () => setOperation('-'));
+        document.getElementById('multiplyBtn').addEventListener('click', () => setOperation('×'));
+        document.getElementById('divideBtn').addEventListener('click', () => setOperation('÷'));
+        document.getElementById('equalsBtn').addEventListener('click', handleEquals);
+        
+        // History Events
+        document.getElementById('historyToggleBtn').addEventListener('click', openHistoryPopup);
+        document.getElementById('closeHistoryBtn').addEventListener('click', closeHistoryPopup);
+        document.getElementById('clearHistoryBtn').addEventListener('click', clearHistory);
+        
+        // Close on outside click
+        document.getElementById('historyOverlay').addEventListener('click', (e) => {
+            if (e.target === document.getElementById('historyOverlay')) {
+                closeHistoryPopup();
+            }
+        });
+        
+        // Keyboard
+        function handleKeyboard(e) {
+            const key = e.key;
+            if (/[0-9]/.test(key)) { e.preventDefault(); addNumber(key); }
+            else if (key === '.') { e.preventDefault(); addNumber('.'); }
+            else if (key === '+') { e.preventDefault(); setOperation('+'); }
+            else if (key === '-') { e.preventDefault(); setOperation('-'); }
+            else if (key === '*') { e.preventDefault(); setOperation('×'); }
+            else if (key === '/') { e.preventDefault(); setOperation('÷'); }
+            else if (key === 'Enter' || key === '=') { e.preventDefault(); handleEquals(); }
+            else if (key === 'Escape') { e.preventDefault(); clearAll(); }
+            else if (key === 'Backspace') { e.preventDefault(); deleteLast(); }
+            else if (key === '%') { e.preventDefault(); percentage(); }
+            else if (key === 'h' || key === 'H') { e.preventDefault(); openHistoryPopup(); }
+        }
+        
+        window.addEventListener('keydown', handleKeyboard);
+        window.recallCalculation = recallCalculation;
+        
+        loadHistory();
+        updateDisplay();
+        updateMemoryIndicator();
+    </script>
+</body>
+</html>
