@@ -43,7 +43,7 @@ background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
     font-size: 2rem;     /* Kam karne ke liye */
 }
 
-/* CSS - Isko style section mein add karo */
+
 .footer {
     text-align: center;
     margin-top: 25px;
@@ -85,4 +85,9 @@ button:hover {
     transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
 }
 
+.splash-screen {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    /* Ya koi aur color */
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+}
 
