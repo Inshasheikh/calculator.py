@@ -8,7 +8,7 @@ This is a beginner-friendly calculator program built using (HTML, CSS, Javascrip
 - Subtraction
 - Multiplication
 - Division
-- Exit option
+
 
 ## Concepts Used
 - While loop
