@@ -1,5 +1,5 @@
 
-# Simple Calculator (Python)
+# Simple Calculator (HTML,CSS, Javascript)
 
 This is a beginner-friendly calculator program built using Python basics.
 
